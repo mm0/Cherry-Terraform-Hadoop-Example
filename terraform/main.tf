@@ -38,6 +38,7 @@ data "template_file" "hadoopenv" {
   template = "${file("./templates/hadoop-env.sh.tmpl")}"
   vars = {
     java_home = "/usr/lib/jvm/java-11-openjdk-amd64/"
+    hadoop_conf_dir = "/opt/hadoop-2.8.2/etc/hadoop"
   }
 }
 data "template_file" "sparkenv" {
@@ -124,6 +125,7 @@ EOT
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
       "chmod +x /tmp/install-hadoop.sh",
@@ -235,6 +237,7 @@ EOT
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
       "chmod +x /tmp/install-hadoop.sh",
@@ -334,6 +337,7 @@ EOT
   }
   provisioner "remote-exec" {
     inline = [
+      "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
       "chmod +x /tmp/install-hadoop.sh",

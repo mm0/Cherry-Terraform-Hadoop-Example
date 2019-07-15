@@ -16,30 +16,24 @@ Some experience with Ansible will make this easier to follow, but is not complet
 Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
 
-- The Cherry Servers module connects to Cherry Servers Public API via cherry-python package. You need to install it with pip (this might need to be done as `sudo`):
-
-    ```bash
-    pip install cherry-python
-    ```
-
 ## Directions
 
 - Create an API Key for your CherryServers account at [https://portal.cherryservers.com/#/settings/api-keys](https://portal.cherryservers.com/#/settings/api-keys)
 
-    Save your API Key somewhere safe and optionally add it to your `~/.profile` file like so:
+    Save your API Key somewhere safe and optionally add it to your `~/.profile` file like so and restart your terminal:
 
     ```
     export CHERRY_AUTH_TOKEN="2b00042f7481c7b056c4b410d28f33cf"
     ```
 
 
-- Next, you will need an SSH key with which to access your servers and for ansible to connect to your servers to configure them.
+- Next, you will need an SSH key with which to access your servers and for terraform to use to provision your servers automatically.
 
     ```
     ssh-keygen -f ~/.ssh/cherry
     ```
 
-    This will create `~/.ssh/cherry` and ~/.ssh/cherry.pub`
+    This will create `~/.ssh/cherry` and `~/.ssh/cherry.pub`
 
     This is the SSH key you will use in order to SSH into your Cherry Server and use with Ansible.  
     
@@ -48,13 +42,13 @@ Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-s
 - While we're add it.  We're going to create a second SSH key that will be used by Hadoop and Spark.  
     Hadoop and Spark master servers SSH into the slaves within their cluster in order to manage them.  
     
-    Our Ansible playbooks will upload this second SSH key to the new servers we create and allow the `hadoop` and `spark` users to SSH using this key. 
+    Our Terraform provisioners will upload this second SSH key to the new servers we create and allow the `hadoop` and `spark` users to SSH using this key. 
     
-    When generating this second key, have it save to the ansible directory here.
+    When generating this second key, have it save to the relative directory here.
 
     ```
-    cd this/directory
-    ssh-keygen -f files/test-key
+    cd terraform/
+    ssh-keygen -f test-key
     ```
 
     This will create `terraform/test-key` and `terraform/test-key.pub`
