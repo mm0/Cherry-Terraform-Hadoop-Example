@@ -21,9 +21,6 @@ Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-s
     ```bash
     pip install cherry-python
     ```
-- You will need to download [this](https://github.com/cherryservers/cherry-ansible-module/tree/master/cherryservers) directory into the `ansible/library` subdirectory of this project.  
-This is the Cherry Servers Ansible Module that we will use to interact with Cherry Server's API. The `ansible.cfg` file in the `ansible` directory has a `library` entry that points to the `library` subdirectory and tells ansible where to find our custom modules.
-
 
 ## Directions
 
@@ -60,8 +57,49 @@ This is the Cherry Servers Ansible Module that we will use to interact with Cher
     ssh-keygen -f files/test-key
     ```
 
-    This will create `ansible/files/test-key` and `ansible/files/test-key.pub`
+    This will create `terraform/test-key` and `terraform/test-key.pub`
+    
+    
+- Let's run `terraform init` in the `terraform/` subdirectory to install the required terraform modules
 
+- In `variables.tf` we configure certain paramters:
+
+    ```
+    # User Variables
+    variable "region" {
+      default = "EU-East-1"
+    }
+    variable "image" {
+      default = "Ubuntu 18.04 64bit"
+    }
+    variable "project_name" {
+      default = "Terraform Hadoop Project"
+    }
+    variable "team_id" {
+      default = "35587"
+    }
+    variable "plan_id" {
+      default = "113"
+    }
+    variable "private_key" {
+      default = "~/.ssh/cherry"
+    }
+    variable "hadoop_private_key" {
+      default = "~/.ssh/cherry"
+    }
+    ```
+    
+    You can modify your `project_name`,`team_id`, `image`, `plan_id`(server type) and set the paths to your private ssh keys in this file
+
+- Once this is set, you can simply run
+    ```bash
+    terraform apply
+    ```
+    This will create your Project, reserve 3 public static IP addresses, and create 1 master node and 2 data nodes with hadoop and spark installed on them.
+    
+    At the end of the process, you should see some output, which will tell you the IP of the master node:
+    
+    
 - The Cluster should now be ready and you will be able to access the admin panels via:
 
     Hadoop UI: [http://cluster_master_ip:50700]()

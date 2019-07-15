@@ -1,10 +1,10 @@
 resource "cherryservers_project" "myproject" {
   team_id = "${var.team_id}"
-  name = "Terraform Hadoop Project"
+  name = "${var.project_name}"
 }
 resource "cherryservers_ssh" "mykey" {
   name = "terraformkey"
-  public_key = "${file("~/.ssh/cherry.pub")}"
+  public_key = "${file("${var.private_key}.pub")}"
 }
 resource "cherryservers_ip" "floating-ip-master" {
   project_id = "${cherryservers_project.myproject.id}"
@@ -166,6 +166,12 @@ EOT
 output "master_ip" {
   value = "${cherryservers_ip.floating-ip-master.address}"
 }
+output "node_1_ip" {
+  value = "${cherryservers_ip.floating-ip-node-1.address}"
+}
+output "node_2_ip" {
+  value = "${cherryservers_ip.floating-ip-node-2.address}"
+}
 
 # Create a node server
 resource "cherryservers_server" "my-node-1-server" {
@@ -256,7 +262,7 @@ EOT
       "EOL",
       "sudo chown -R spark /opt/spark-2.4.0-bin-without-hadoop",
       "sudo chown -R hadoop /opt/hadoop-2.8.2",
-      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -format'"
+      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'"
     ]
     connection {
       type = "ssh"
@@ -355,7 +361,7 @@ EOT
       "EOL",
       "sudo chown -R spark /opt/spark-2.4.0-bin-without-hadoop",
       "sudo chown -R hadoop /opt/hadoop-2.8.2",
-      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -format'"
+      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'"
     ]
     connection {
       type = "ssh"
