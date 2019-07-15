@@ -9,7 +9,7 @@ variable "team_id" {
   default = "35587"
 }
 variable "plan_id" {
-  default = "86"
+  default = "113"
 }
 variable "private_key" {
   default = "~/.ssh/cherry"
