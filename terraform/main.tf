@@ -128,10 +128,6 @@ EOT
   provisioner "remote-exec" {
     inline = [
       "ssh-keyscan -H ${self.primary_ip} >> /etc/ssh/ssh_known_hosts",
-      "ssh-keyscan -H 0.0.0.0 >> /etc/ssh/ssh_known_hosts",
-      "ssh-keyscan -H ${cherryservers_ip.floating-ip-master.address} >> /etc/ssh/ssh_known_hosts",
-      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-1.address} >> /etc/ssh/ssh_known_hosts",
-      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-2.address} >> /etc/ssh/ssh_known_hosts",
       "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
@@ -279,7 +275,6 @@ EOT
       "EOL",
       "sudo chown -R spark /opt/spark-2.4.0-bin-without-hadoop",
       "sudo chown -R hadoop /opt/hadoop-2.8.2",
-//      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'",
     ]
     connection {
       type = "ssh"
@@ -387,7 +382,6 @@ EOT
       "EOL",
       "sudo chown -R spark /opt/spark-2.4.0-bin-without-hadoop",
       "sudo chown -R hadoop /opt/hadoop-2.8.2",
-//      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'"
     ]
     connection {
       type = "ssh"
@@ -406,6 +400,10 @@ resource null_resource "start_services" {
   ]
   provisioner "remote-exec" {
     inline = [
+      "ssh-keyscan -H 0.0.0.0 >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-master.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-1.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-2.address} >> /etc/ssh/ssh_known_hosts",
       "sudo su - hadoop -c '/opt/hadoop-2.8.2/sbin/start-dfs.sh'",
       "sudo su - spark -c '/opt/spark-2.4.0-bin-without-hadoop/sbin/start-all.sh'"
     ]
