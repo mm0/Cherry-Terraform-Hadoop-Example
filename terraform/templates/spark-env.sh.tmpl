@@ -10,5 +10,5 @@ SPARK_MASTER_PORT=${ spark_master_port }
 SPARK_WORKER_PORT=${ spark_worker_work_port }
 SPARK_WORKER_WEBUI_PORT=${ spark_worker_ui_port } #Avoid conflict with kafka ports
 
-export SPARK_DIST_CLASSPATH=$$(/opt/hadoop-2.8.2/bin/hadoop classpath)
+export SPARK_DIST_CLASSPATH=$(/opt/hadoop-2.8.2/bin/hadoop classpath)
 

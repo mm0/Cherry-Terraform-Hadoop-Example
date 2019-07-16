@@ -85,7 +85,7 @@ resource "cherryservers_server" "my-master-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-master.address}"
       private_key = "${file(var.private_key)}"
-      agent = false
+      timeout = "20m"
     }
   }
 
@@ -98,6 +98,7 @@ resource "cherryservers_server" "my-master-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-master.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
   provisioner "remote-exec" {
@@ -111,6 +112,7 @@ resource "cherryservers_server" "my-master-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-master.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
   provisioner "local-exec" {
@@ -125,6 +127,11 @@ EOT
   }
   provisioner "remote-exec" {
     inline = [
+      "ssh-keyscan -H ${self.primary_ip} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H 0.0.0.0 >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-master.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-1.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-2.address} >> /etc/ssh/ssh_known_hosts",
       "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
@@ -147,7 +154,7 @@ EOT
       "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/slaves <<EOL",
       "${data.template_file.slaves.rendered}",
       "EOL",
-      "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/hadoop-env.sh <<EOL",
+      "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/spark-env.sh <<EOL",
       "${data.template_file.sparkenv.rendered}",
       "EOL",
       "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/spark-profile.sh <<EOL",
@@ -162,6 +169,7 @@ EOT
       user = "root"
       host = "${cherryservers_ip.floating-ip-master.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
 }
@@ -197,7 +205,7 @@ resource "cherryservers_server" "my-node-1-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-1.address}"
       private_key = "${file(var.private_key)}"
-      agent = false
+      timeout = "20m"
     }
   }
 
@@ -223,6 +231,7 @@ resource "cherryservers_server" "my-node-1-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-1.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
   provisioner "local-exec" {
@@ -237,6 +246,11 @@ EOT
   }
   provisioner "remote-exec" {
     inline = [
+      "ssh-keyscan -H ${self.primary_ip} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H 0.0.0.0 >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-master.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-1.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-2.address} >> /etc/ssh/ssh_known_hosts",
       "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
@@ -251,13 +265,13 @@ EOT
       "cat > /opt/hadoop-2.8.2/etc/hadoop/hadoop-env.sh <<EOL",
       "${data.template_file.hadoopenv.rendered}",
       "EOL",
-      "cat > /opt/hadoop-2.8.2/etc/hadoop/slaves <<EOL",
-      "${data.template_file.slaves.rendered}",
+      "cat > /opt/hadoop-2.8.2/etc/hadoop/master <<EOL",
+      "${cherryservers_ip.floating-ip-master.address}",
       "EOL",
       "chmod +x /tmp/install-spark.sh",
       "/tmp/install-spark.sh",
       "echo ${cherryservers_ip.floating-ip-master.address} > /opt/spark-2.4.0-bin-without-hadoop/conf/master",
-      "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/hadoop-env.sh <<EOL",
+      "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/spark-env.sh <<EOL",
       "${data.template_file.sparkenv.rendered}",
       "EOL",
       "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/spark-profile.sh <<EOL",
@@ -265,13 +279,14 @@ EOT
       "EOL",
       "sudo chown -R spark /opt/spark-2.4.0-bin-without-hadoop",
       "sudo chown -R hadoop /opt/hadoop-2.8.2",
-      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'"
+//      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'",
     ]
     connection {
       type = "ssh"
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-1.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
 
   }
@@ -297,7 +312,6 @@ resource "cherryservers_server" "my-node-2-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-2.address}"
       private_key = "${file(var.private_key)}"
-      agent = false
     }
   }
 
@@ -310,6 +324,7 @@ resource "cherryservers_server" "my-node-2-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-2.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
   provisioner "remote-exec" {
@@ -323,6 +338,7 @@ resource "cherryservers_server" "my-node-2-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-2.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
   provisioner "local-exec" {
@@ -337,6 +353,11 @@ EOT
   }
   provisioner "remote-exec" {
     inline = [
+      "ssh-keyscan -H ${self.primary_ip} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H 0.0.0.0 >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-master.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-1.address} >> /etc/ssh/ssh_known_hosts",
+      "ssh-keyscan -H ${cherryservers_ip.floating-ip-node-2.address} >> /etc/ssh/ssh_known_hosts",
       "sudo chown -R hadoop.hadoop /home/hadoop/.ssh; sudo chown -R spark.spark /home/spark/.ssh; ",
       "sudo chmod 700 /home/spark/.ssh ; sudo chmod 0600 /home/spark/.ssh/id_rsa ",
       "sudo chmod 700 /home/hadoop/.ssh ; sudo chmod 0600 /home/hadoop/.ssh/id_rsa",
@@ -351,13 +372,13 @@ EOT
       "cat > /opt/hadoop-2.8.2/etc/hadoop/hadoop-env.sh <<EOL",
       "${data.template_file.hadoopenv.rendered}",
       "EOL",
-      "cat > /opt/hadoop-2.8.2/etc/hadoop/slaves <<EOL",
-      "${data.template_file.slaves.rendered}",
+      "cat > /opt/hadoop-2.8.2/etc/hadoop/master <<EOL",
+      "${cherryservers_ip.floating-ip-master.address}",
       "EOL",
       "chmod +x /tmp/install-spark.sh",
       "/tmp/install-spark.sh",
       "echo ${cherryservers_ip.floating-ip-master.address} > /opt/spark-2.4.0-bin-without-hadoop/conf/master",
-      "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/hadoop-env.sh <<EOL",
+      "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/spark-env.sh <<EOL",
       "${data.template_file.sparkenv.rendered}",
       "EOL",
       "cat > /opt/spark-2.4.0-bin-without-hadoop/conf/spark-profile.sh <<EOL",
@@ -365,13 +386,34 @@ EOT
       "EOL",
       "sudo chown -R spark /opt/spark-2.4.0-bin-without-hadoop",
       "sudo chown -R hadoop /opt/hadoop-2.8.2",
-      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'"
+//      "sudo su - hadoop -c '/opt/hadoop-2.8.2/bin/hadoop datanode -regular'"
     ]
     connection {
       type = "ssh"
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-2.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
+    }
+  }
+}
+resource null_resource "start_services" {
+  depends_on = [
+    "cherryservers_server.my-master-server",
+    "cherryservers_server.my-node-1-server",
+    "cherryservers_server.my-node-2-server"
+  ]
+  provisioner "remote-exec" {
+    inline = [
+      "sudo su - hadoop -c '/opt/spark-2.4.0-bin-without-hadoop/bin/start-dfs.sh",
+      "sudo su - spark -c '/opt/spark-2.4.0-bin-without-hadoop/sbin/start-all.sh"
+    ]
+    connection {
+      type = "ssh"
+      user = "root"
+      host = "${cherryservers_ip.floating-ip-master.address}"
+      private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
 }

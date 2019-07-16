@@ -32,6 +32,9 @@ sudo mkdir -p /tmp/temp-install
 # create install directory
 sudo mkdir -p /opt/hadoop-2.8.2
 
+# create logs directory
+sudo mkdir -p /opt/hadoop-2.8.2/logs
+
 
 # download hadoop
 cd /opt; sudo wget https://archive.apache.org/dist/hadoop/common/hadoop-2.8.2/hadoop-2.8.2.tar.gz
@@ -40,5 +43,6 @@ cd /opt; sudo wget https://archive.apache.org/dist/hadoop/common/hadoop-2.8.2/ha
 sudo tar zxvf hadoop-2.8.2.tar.gz
 
 sudo chown -R hadoop /var/hadoop/data  /var/hadoop/name /var/hadoop/hdfs/tmp /tmp/temp-install /opt/hadoop-2.8.2
+sudo chgrp -R hadoop /var/hadoop/data  /var/hadoop/name /var/hadoop/hdfs/tmp /tmp/temp-install /opt/hadoop-2.8.2
 
 
