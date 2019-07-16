@@ -312,6 +312,7 @@ resource "cherryservers_server" "my-node-2-server" {
       user = "root"
       host = "${cherryservers_ip.floating-ip-node-2.address}"
       private_key = "${file(var.private_key)}"
+      timeout = "20m"
     }
   }
 
@@ -405,8 +406,8 @@ resource null_resource "start_services" {
   ]
   provisioner "remote-exec" {
     inline = [
-      "sudo su - hadoop -c '/opt/spark-2.4.0-bin-without-hadoop/bin/start-dfs.sh",
-      "sudo su - spark -c '/opt/spark-2.4.0-bin-without-hadoop/sbin/start-all.sh"
+      "sudo su - hadoop -c '/opt/hadoop-2.8.2/sbin/start-dfs.sh'",
+      "sudo su - spark -c '/opt/spark-2.4.0-bin-without-hadoop/sbin/start-all.sh'"
     ]
     connection {
       type = "ssh"
