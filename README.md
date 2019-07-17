@@ -15,6 +15,7 @@ Some experience with Ansible will make this easier to follow, but is not complet
 - Make sure you have Terraform installed locally. 
 Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-started/install.html)
 
+- `Terraform init` should automatically download the cherryservers terraform module for you, but if for some reason this isn't available, you can install it yourself by following these instructions [https://github.com/cherryservers/terraform-provider-cherryservers](https://github.com/cherryservers/terraform-provider-cherryservers)
 
 ## Directions
 
@@ -37,9 +38,9 @@ Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-s
 
     This is the SSH key you will use in order to SSH into your Cherry Server and use with Ansible.  
     
-    You can configure your ~/.ssh/config to use this new key with the IP addresses for your servers that we will create further below.
+-   (Optional) You can configure your ~/.ssh/config to use this new key with the IP addresses for your servers that we will create further below.
 
-- While we're add it.  We're going to create a second SSH key that will be used by Hadoop and Spark.  
+-   (Optional) While we're add it.  We're going to create a second SSH key that will be used by Hadoop and Spark.  
     Hadoop and Spark master servers SSH into the slaves within their cluster in order to manage them.  
     
     Our Terraform provisioners will upload this second SSH key to the new servers we create and allow the `hadoop` and `spark` users to SSH using this key. 
@@ -56,7 +57,7 @@ Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-s
     
 - Let's run `terraform init` in the `terraform/` subdirectory to install the required terraform modules
 
-- In `variables.tf` we configure certain paramters:
+- In `variables.tf` we configure certain parameters that should be self explanatory:
 
     ```
     # User Variables
@@ -83,19 +84,22 @@ Instructions can be found [here](https://learn.hashicorp.com/terraform/getting-s
     }
     ```
     
-    You can modify your `project_name`,`team_id`, `image`, `plan_id`(server type) and set the paths to your private ssh keys in this file
+    You can modify your `project_name`,`team_id`, `image`, `plan_id`(server type) and set the paths to your private ssh keys in this file. In this example, we are using the same SSH key for `private_key` and `hadoop_private_key`, but it is recommended to use a separate key for hadoop as the `private_key` has root privileges.
 
-- Once this is set, you can simply run
+- Once this is set, you can simply run (and type yes and press enter when it asks you to confirm)
     ```bash
     terraform apply
     ```
-    This will create your Project, reserve 3 public static IP addresses, and create 1 master node and 2 data nodes with hadoop and spark installed on them.
     
-    At the end of the process, you should see some output, which will tell you the IP of the master node:
+    This will create your Project, reserve 3 public static IP addresses, and create 1 master node and 2 data nodes with hadoop and spark installed on them. This process may take up to 20 minutes to complete
+    
+    At the end of the process, you should see some output, which will tell you the IP of the master node, or you can run `terraform output master_ip` to find the master IP for your cluster:
+    
+    After you are done with this cluster, simply run `terraform destroy` and all the resources (project, IPs, servers, etc) will be automatically deleted from Cherry Servers.
     
     
 - The Cluster should now be ready and you will be able to access the admin panels via:
 
-    Hadoop UI: [http://cluster_master_ip:50700]()
+    Hadoop UI: [http://master_ip:50700]()
 
-    Spark UI: [http://cluster_master_ip:8080]()
+    Spark UI: [http://master_ip:8080]()
